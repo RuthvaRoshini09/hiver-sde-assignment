@@ -1,0 +1,6 @@
+brand,support_tweets,connected_customer_tweets,response_pairs,completeness_pct,usable_customer_msgs,usable_customer_pct,meaningful_pairs,meaningful_pairs_pct,dm_deflection_pct,direct_resolution_pct,top_customer_keywords
+AmazonHelp,169840,255479,168814,99.72,153800,91.11,151379,89.67,0.89,5.67,"order (21403), delivery (18512), prime (14252), delivered (10526), service (10449), customer (9624), que (9165), day (8909)"
+AppleSupport,106860,143281,106646,99.93,101601,95.27,101481,95.16,52.62,23.98,"phone (21996), iphone (20191), ios (15901), update (15887), fix (14223), new (9044), battery (8527), since (5969)"
+Uber_Support,56270,77342,56160,99.82,54151,96.42,54113,96.36,35.98,1.52,"driver (11973), ride (5558), app (5219), account (4846), charged (4458), drivers (3866), order (3526), trip (3492)"
+SpotifyCares,43265,56681,43092,99.65,40615,94.25,40560,94.12,30.93,13.58,"account (5409), premium (4584), app (3921), songs (3054), music (2982), still (2208), song (2099), don (1978)"
+Delta,42253,50604,42114,99.8,40192,95.44,38813,92.16,17.16,1.86,"flight (12056), time (2689), service (2664), seat (2170), gate (2133), amp (1929), plane (1891), customer (1882)"

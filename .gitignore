@@ -1,0 +1,39 @@
+# Environments and secrets
+.env
+*.env
+*.key
+*.pem
+
+# Python virtual environments & bytecode
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Large raw dataset (>100MB violates GitHub hard limit; twcs.csv is ~493MB)
+data/twcs.csv
+
+# Large/intermediate processed artifacts
+data/processed/applesupport_conversations.csv
+data/processed/applesupport_pairs.csv
+data/processed/golden_set_200_before_relabel.csv
+data/processed/golden_final_review.csv
+data/processed/golden_relabel_proposal.csv
+data/processed/golden_set_final_draft.csv
+data/processed/golden_set_template.csv
+data/processed/golden_ambiguous_review.csv
+data/processed/llm_judge_results.csv
+data/processed/llm_judge_summary.json
+data/processed/table_56.txt
+
+# OS metadata & temporary files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & editor configurations
+.idea/
+.vscode/

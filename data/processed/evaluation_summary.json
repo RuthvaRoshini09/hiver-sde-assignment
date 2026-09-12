@@ -1,0 +1,279 @@
+{
+  "dataset_size": 200,
+  "intent_metrics": {
+    "accuracy": 0.165,
+    "macro_precision": 0.1756,
+    "macro_recall": 0.1842,
+    "macro_f1": 0.1716,
+    "weighted_f1": 0.1616
+  },
+  "per_class_metrics": {
+    "app_crash_download_error": {
+      "precision": 0.2143,
+      "recall": 0.2727,
+      "f1_score": 0.24,
+      "support": 11
+    },
+    "apple_id_account_access": {
+      "precision": 0.25,
+      "recall": 0.1481,
+      "f1_score": 0.186,
+      "support": 27
+    },
+    "battery_drain_charging": {
+      "precision": 0.1875,
+      "recall": 0.2308,
+      "f1_score": 0.2069,
+      "support": 13
+    },
+    "billing_subscription_refund": {
+      "precision": 0.1333,
+      "recall": 0.0556,
+      "f1_score": 0.0784,
+      "support": 36
+    },
+    "bluetooth_airpods_carplay": {
+      "precision": 0.2857,
+      "recall": 0.2353,
+      "f1_score": 0.2581,
+      "support": 17
+    },
+    "hardware_buttons_audio": {
+      "precision": 0.2,
+      "recall": 0.1364,
+      "f1_score": 0.1622,
+      "support": 22
+    },
+    "keyboard_text_glitch": {
+      "precision": 0.1333,
+      "recall": 0.2857,
+      "f1_score": 0.1818,
+      "support": 7
+    },
+    "network_wifi_cellular": {
+      "precision": 0.1429,
+      "recall": 0.1667,
+      "f1_score": 0.1538,
+      "support": 12
+    },
+    "os_update_installation": {
+      "precision": 0.0667,
+      "recall": 0.0769,
+      "f1_score": 0.0714,
+      "support": 13
+    },
+    "other_general_inquiry": {
+      "precision": 0.1176,
+      "recall": 0.2308,
+      "f1_score": 0.1558,
+      "support": 26
+    },
+    "screen_touch_freeze": {
+      "precision": 0.2,
+      "recall": 0.1875,
+      "f1_score": 0.1935,
+      "support": 16
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "app_crash_download_error",
+      "apple_id_account_access",
+      "battery_drain_charging",
+      "billing_subscription_refund",
+      "bluetooth_airpods_carplay",
+      "hardware_buttons_audio",
+      "keyboard_text_glitch",
+      "network_wifi_cellular",
+      "os_update_installation",
+      "other_general_inquiry",
+      "screen_touch_freeze"
+    ],
+    "matrix": [
+      [
+        3,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        2,
+        1,
+        3,
+        0
+      ],
+      [
+        0,
+        4,
+        2,
+        2,
+        0,
+        1,
+        4,
+        2,
+        1,
+        9,
+        2
+      ],
+      [
+        3,
+        0,
+        3,
+        2,
+        1,
+        1,
+        0,
+        0,
+        0,
+        2,
+        1
+      ],
+      [
+        3,
+        4,
+        0,
+        2,
+        1,
+        0,
+        5,
+        1,
+        4,
+        13,
+        3
+      ],
+      [
+        2,
+        2,
+        1,
+        2,
+        4,
+        2,
+        1,
+        0,
+        0,
+        2,
+        1
+      ],
+      [
+        1,
+        4,
+        1,
+        0,
+        1,
+        3,
+        2,
+        0,
+        3,
+        6,
+        1
+      ],
+      [
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        1,
+        0,
+        2,
+        0
+      ],
+      [
+        1,
+        0,
+        3,
+        1,
+        1,
+        2,
+        0,
+        2,
+        0,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        2,
+        3,
+        0,
+        1,
+        0,
+        0,
+        1,
+        5,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        2,
+        4,
+        3,
+        1,
+        5,
+        2,
+        6,
+        2
+      ],
+      [
+        1,
+        2,
+        1,
+        0,
+        2,
+        1,
+        0,
+        1,
+        3,
+        2,
+        3
+      ]
+    ]
+  },
+  "escalation_evaluation": {
+    "status": "NOT_EVALUABLE",
+    "reason": "final_escalation contains zero positive examples in the golden set",
+    "total_golden_rows": 200,
+    "escalation_labels_available": 144,
+    "escalation_labels_missing": 56,
+    "escalation_true_count": 0,
+    "escalation_false_count": 144,
+    "human_ground_truth_distribution": {
+      "False": 144,
+      "True": 0,
+      "Unlabeled_NaN": 56
+    },
+    "agent_decisions": {
+      "AUTO_HANDLE": 131,
+      "ESCALATE": 69,
+      "ERROR": 0
+    },
+    "agent_escalation_rate": 0.345
+  },
+  "retrieval_diagnostics": {
+    "total_queries": 200,
+    "queries_with_retrieval": 200,
+    "retrieval_coverage_rate": 1.0,
+    "mean_top_1_similarity": 0.3977,
+    "median_top_1_similarity": 0.3731,
+    "min_top_1_similarity": 0.1964,
+    "max_top_1_similarity": 1.0,
+    "lexical_match_at_1_count": 160,
+    "lexical_match_at_1_rate": 0.8,
+    "diagnostic_note": "lexical_match_at_1 is a heuristic diagnostic (token Jaccard >= 0.15) and NOT human-labelled retrieval accuracy."
+  },
+  "reply_diagnostics": {
+    "total_queries": 200,
+    "reply_exists_count": 200,
+    "reply_coverage_rate": 1.0,
+    "retrieval_backed_reply_count": 200,
+    "retrieval_backed_reply_rate": 1.0,
+    "fallback_reply_count": 0
+  },
+  "row_errors_count": 0
+}

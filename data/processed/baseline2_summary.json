@@ -1,0 +1,337 @@
+{
+  "model_name": "Baseline 2 (Deterministic Rule-Based Keyword Matching)",
+  "golden_set_file": "data/processed/golden_set_final.csv",
+  "dataset_size": 200,
+  "taxonomy": {
+    "num_classes": 11,
+    "classes": [
+      "app_crash_download_error",
+      "apple_id_account_access",
+      "battery_drain_charging",
+      "billing_subscription_refund",
+      "bluetooth_airpods_carplay",
+      "hardware_buttons_audio",
+      "keyboard_text_glitch",
+      "network_wifi_cellular",
+      "os_update_installation",
+      "other_general_inquiry",
+      "screen_touch_freeze"
+    ],
+    "fallback_class": "other_general_inquiry"
+  },
+  "metrics": {
+    "accuracy": 0.17,
+    "macro_precision": 0.1764,
+    "macro_recall": 0.1919,
+    "macro_f1": 0.1756,
+    "weighted_f1": 0.1629
+  },
+  "per_class_metrics": {
+    "app_crash_download_error": {
+      "precision": 0.2,
+      "recall": 0.2727,
+      "f1_score": 0.2308,
+      "support": 11
+    },
+    "apple_id_account_access": {
+      "precision": 0.2,
+      "recall": 0.1111,
+      "f1_score": 0.1429,
+      "support": 27
+    },
+    "battery_drain_charging": {
+      "precision": 0.2,
+      "recall": 0.2308,
+      "f1_score": 0.2143,
+      "support": 13
+    },
+    "billing_subscription_refund": {
+      "precision": 0.1333,
+      "recall": 0.0556,
+      "f1_score": 0.0784,
+      "support": 36
+    },
+    "bluetooth_airpods_carplay": {
+      "precision": 0.2667,
+      "recall": 0.2353,
+      "f1_score": 0.25,
+      "support": 17
+    },
+    "hardware_buttons_audio": {
+      "precision": 0.2,
+      "recall": 0.1364,
+      "f1_score": 0.1622,
+      "support": 22
+    },
+    "keyboard_text_glitch": {
+      "precision": 0.1333,
+      "recall": 0.2857,
+      "f1_score": 0.1818,
+      "support": 7
+    },
+    "network_wifi_cellular": {
+      "precision": 0.2,
+      "recall": 0.25,
+      "f1_score": 0.2222,
+      "support": 12
+    },
+    "os_update_installation": {
+      "precision": 0.0667,
+      "recall": 0.0769,
+      "f1_score": 0.0714,
+      "support": 13
+    },
+    "other_general_inquiry": {
+      "precision": 0.14,
+      "recall": 0.2692,
+      "f1_score": 0.1842,
+      "support": 26
+    },
+    "screen_touch_freeze": {
+      "precision": 0.2,
+      "recall": 0.1875,
+      "f1_score": 0.1935,
+      "support": 16
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "app_crash_download_error",
+      "apple_id_account_access",
+      "battery_drain_charging",
+      "billing_subscription_refund",
+      "bluetooth_airpods_carplay",
+      "hardware_buttons_audio",
+      "keyboard_text_glitch",
+      "network_wifi_cellular",
+      "os_update_installation",
+      "other_general_inquiry",
+      "screen_touch_freeze"
+    ],
+    "matrix": [
+      [
+        3,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        2,
+        1,
+        3,
+        0
+      ],
+      [
+        0,
+        3,
+        2,
+        2,
+        1,
+        1,
+        4,
+        2,
+        1,
+        9,
+        2
+      ],
+      [
+        3,
+        0,
+        3,
+        2,
+        1,
+        1,
+        0,
+        0,
+        0,
+        2,
+        1
+      ],
+      [
+        3,
+        4,
+        0,
+        2,
+        1,
+        0,
+        5,
+        1,
+        4,
+        13,
+        3
+      ],
+      [
+        3,
+        1,
+        1,
+        2,
+        4,
+        2,
+        2,
+        0,
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        4,
+        1,
+        0,
+        1,
+        3,
+        2,
+        0,
+        3,
+        6,
+        1
+      ],
+      [
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        1,
+        0,
+        2,
+        0
+      ],
+      [
+        1,
+        0,
+        2,
+        1,
+        1,
+        2,
+        0,
+        3,
+        0,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        2,
+        3,
+        0,
+        1,
+        0,
+        1,
+        1,
+        4,
+        1
+      ],
+      [
+        0,
+        1,
+        1,
+        2,
+        4,
+        3,
+        0,
+        4,
+        2,
+        7,
+        2
+      ],
+      [
+        1,
+        2,
+        1,
+        0,
+        2,
+        1,
+        0,
+        1,
+        3,
+        2,
+        3
+      ]
+    ]
+  },
+  "baseline1_comparison": {
+    "status": "SUCCESS",
+    "model_type": "TF-IDF (1-2 ngrams) + Logistic Regression",
+    "accuracy": 0.165,
+    "macro_precision": 0.1756,
+    "macro_recall": 0.1842,
+    "macro_f1": 0.1716,
+    "weighted_f1": 0.1616,
+    "per_class_metrics": {
+      "app_crash_download_error": {
+        "precision": 0.2143,
+        "recall": 0.2727,
+        "f1_score": 0.24,
+        "support": 11
+      },
+      "apple_id_account_access": {
+        "precision": 0.25,
+        "recall": 0.1481,
+        "f1_score": 0.186,
+        "support": 27
+      },
+      "battery_drain_charging": {
+        "precision": 0.1875,
+        "recall": 0.2308,
+        "f1_score": 0.2069,
+        "support": 13
+      },
+      "billing_subscription_refund": {
+        "precision": 0.1333,
+        "recall": 0.0556,
+        "f1_score": 0.0784,
+        "support": 36
+      },
+      "bluetooth_airpods_carplay": {
+        "precision": 0.2857,
+        "recall": 0.2353,
+        "f1_score": 0.2581,
+        "support": 17
+      },
+      "hardware_buttons_audio": {
+        "precision": 0.2,
+        "recall": 0.1364,
+        "f1_score": 0.1622,
+        "support": 22
+      },
+      "keyboard_text_glitch": {
+        "precision": 0.1333,
+        "recall": 0.2857,
+        "f1_score": 0.1818,
+        "support": 7
+      },
+      "network_wifi_cellular": {
+        "precision": 0.1429,
+        "recall": 0.1667,
+        "f1_score": 0.1538,
+        "support": 12
+      },
+      "os_update_installation": {
+        "precision": 0.0667,
+        "recall": 0.0769,
+        "f1_score": 0.0714,
+        "support": 13
+      },
+      "other_general_inquiry": {
+        "precision": 0.1176,
+        "recall": 0.2308,
+        "f1_score": 0.1558,
+        "support": 26
+      },
+      "screen_touch_freeze": {
+        "precision": 0.2,
+        "recall": 0.1875,
+        "f1_score": 0.1935,
+        "support": 16
+      }
+    },
+    "delta_accuracy (B2 - B1)": 0.005,
+    "delta_macro_f1 (B2 - B1)": 0.004,
+    "delta_weighted_f1 (B2 - B1)": 0.0012
+  }
+}
