@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AppleSupport Agent — AI Customer Support Triaging &amp; Grounded Reply System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Ambient background decorative blur shapes -->
+  <div class="bg-ambient-1" aria-hidden="true"></div>
+  <div class="bg-ambient-2" aria-hidden="true"></div>
+
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-badge">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </span>
+        <span class="status-pill">
+          <span class="status-dot"></span>
+          System Ready
+        </span>
+      </div>
+      <h1 class="app-title">AppleSupport Agent</h1>
+      <p class="app-subtitle">AI-powered customer support triaging &amp; grounded reply system</p>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-card-container">
+      <!-- Input Card -->
+      <section class="card input-card">
+        <div class="card-intro">
+          <h2 class="card-title">Analyze Customer Message</h2>
+          <p class="card-description">
+            Enter a customer issue to classify, retrieve similar historical cases, and generate a grounded response.
+          </p>
+        </div>
+
+        <div class="input-body">
+          <div class="textarea-wrapper">
+            <textarea
+              id="tweetInput"
+              class="customer-textarea"
+              rows="3"
+              placeholder="Paste a customer support message..."
+              aria-label="Customer support message"
+            ></textarea>
+          </div>
+
+          <div class="input-actions">
+            <button type="button" id="analyzeBtn" class="btn-primary">
+              <span class="btn-content">
+                <span class="btn-icon" aria-hidden="true">✈</span>
+                <span class="btn-label">Analyze Tweet</span>
+              </span>
+              <span class="btn-spinner" aria-hidden="true" style="display: none;">
+                <svg class="spinner-svg" viewBox="0 0 24 24" fill="none">
+                  <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                  <path class="spinner-head" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Analyzing...</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Error Alert Banner -->
+          <div id="errorAlert" class="error-banner" style="display: none;" role="alert">
+            <svg class="error-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span id="errorMessage" class="error-text">Unable to analyze message. Please try again.</span>
+          </div>
+
+          <!-- Examples Section -->
+          <div class="examples-section">
+            <div class="examples-header">
+              <span class="examples-label">Try an example</span>
+            </div>
+            <div class="examples-chips" id="examplesList">
+              <button type="button" class="example-chip" data-query="How do I cancel my Apple Music subscription?">
+                "How do I cancel my Apple Music subscription?"
+              </button>
+              <button type="button" class="example-chip" data-query="My iPhone 7 battery drains from 100% to 20% in less than 3 hours since the iOS 11 update. This is ridiculous!">
+                "My iPhone battery drains rapidly after the update"
+              </button>
+              <button type="button" class="example-chip" data-query="Every time I type the letter I it changes to A [?] on my iPhone. This autocorrect bug is so annoying!">
+                "Letter 'I' autocorrects to symbol bug"
+              </button>
+              <button type="button" class="example-chip" data-query="I forgot my Apple ID password and now my account is locked. I can't access anything on my phone!">
+                "Forgot Apple ID password and locked out"
+              </button>
+              <button type="button" class="example-chip" data-query="The home button on my iPhone 7 is completely broken and doesn't respond to touch anymore.">
+                "Home button is broken and unresponsive"
+              </button>
+              <button type="button" class="example-chip" data-query="My iPhone screen is completely frozen and won't respond to touch. Force restart doesn't work either.">
+                "Screen is completely frozen and won't restart"
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Stack (Hidden before first analysis, revealed smoothly) -->
+      <div id="resultsStack" class="results-stack" style="display: none;" aria-live="polite">
+        <!-- 1. Decision Card -->
+        <section class="card result-card decision-card">
+          <div class="card-header-row">
+            <div class="header-title-group">
+              <span class="header-icon-small" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="9 11 12 14 22 4"></polyline>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+              </span>
+              <h2 class="card-section-title">Decision</h2>
+            </div>
+            <div id="decisionBadge" class="status-badge auto-handle">
+              <span class="badge-icon" id="decisionIcon">✓</span>
+              <span id="decisionLabel">AUTO-HANDLE</span>
+            </div>
+          </div>
+          <div class="decision-reason-container">
+            <div class="reason-caption">Decision Reasoning:</div>
+            <p id="decisionReason" class="decision-reason-content">
+              Historical support cases provide sufficient evidence for this request.
+            </p>
+          </div>
+        </section>
+
+        <!-- 2. Intent Classification Card -->
+        <section class="card result-card intent-card">
+          <div class="card-header-row">
+            <div class="header-title-group">
+              <span class="header-icon-small" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+              </span>
+              <h2 class="card-section-title">Intent Classification</h2>
+            </div>
+          </div>
+          
+          <div class="intent-details-grid">
+            <div class="intent-row">
+              <span class="meta-label">Detected Intent</span>
+              <span id="detectedIntent" class="intent-pill">billing_subscription_refund</span>
+            </div>
+            <div class="confidence-row">
+              <div class="confidence-header">
+                <span class="meta-label">Confidence</span>
+                <span id="confidencePercentage" class="confidence-number">99.8%</span>
+              </div>
+              <div class="progress-track" aria-hidden="true">
+                <div id="confidenceBar" class="progress-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Retrieved Context Card -->
+        <section class="card result-card retrieved-card">
+          <div class="card-header-row">
+            <div class="header-title-group">
+              <span class="header-icon-small" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </span>
+              <div>
+                <h2 class="card-section-title">Retrieved Context</h2>
+                <span class="card-subtitle-small">Historical AppleSupport conversation used for grounding</span>
+              </div>
+            </div>
+            <div class="similarity-pill">
+              <span class="similarity-caption">Similarity:</span>
+              <span id="similarityScore" class="similarity-value">64.8%</span>
+            </div>
+          </div>
+
+          <!-- Pagination / case navigator -->
+          <div class="cases-pager-row" id="casesPagerRow">
+            <span id="caseIndexIndicator" class="case-counter">Top Match (Case 1 of 5)</span>
+            <div class="pager-controls">
+              <button type="button" id="prevCaseBtn" class="pager-arrow" title="Previous case" disabled>&larr;</button>
+              <button type="button" id="nextCaseBtn" class="pager-arrow" title="Next case">&rarr;</button>
+            </div>
+          </div>
+
+          <div class="context-blocks">
+            <div class="context-subblock">
+              <div class="subblock-header">
+                <span class="subblock-tag">SIMILAR CUSTOMER TWEET</span>
+              </div>
+              <div id="similarCustomerTweet" class="quote-container customer-quote">
+                "hey guys how do I cancel my subscription?"
+              </div>
+            </div>
+
+            <div class="context-subblock">
+              <div class="subblock-header">
+                <span class="subblock-tag">HISTORICAL SUPPORT RESPONSE</span>
+              </div>
+              <div id="historicalSupportResponse" class="quote-container support-quote">
+                "We're here for you. Check out this article to cancel a subscription: https://t.co/vyd19gEs6v"
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Generated Reply Card (Prominent Hero Result) -->
+        <section class="card result-card reply-hero-card">
+          <div class="card-header-row">
+            <div class="header-title-group">
+              <span class="sparkle-icon" aria-hidden="true">✨</span>
+              <h2 class="card-section-title reply-title">Generated Reply</h2>
+            </div>
+            <button type="button" id="copyReplyBtn" class="btn-copy" title="Copy generated reply">
+              <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="copyBtnLabel">Copy Reply</span>
+            </button>
+          </div>
+          
+          <div class="reply-bubble-wrapper">
+            <div class="apple-author-row">
+              <span class="author-handle">@AppleSupport</span>
+              <span class="verified-check" title="Verified Apple Support account">✓</span>
+              <span class="grounded-badge">Grounded in historical cases</span>
+            </div>
+            <p id="generatedReplyContainer" class="generated-reply-body">
+              We're here for you. Check out this article to cancel a subscription: https://t.co/vyd19gEs6v
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Hiver SDE Assignment &bull; AppleSupport Automated Agent</p>
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

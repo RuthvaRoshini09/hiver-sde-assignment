@@ -216,6 +216,74 @@ def call_openai_judge(
     raise RuntimeError(f"Failed after {max_retries} attempts: {last_error}")
 
 
+def load_env_file(env_path: Path):
+    """Optionally loads key-value pairs from a local .env file if present."""
+    if not env_path.is_file():
+        return
+    try:
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip("'\"")
+                if k and k not in os.environ:
+                    os.environ[k] = v
+    except Exception:
+        pass
+
+
+def is_valid_openai_api_key(key: Optional[str]) -> Tuple[bool, str]:
+    """
+    Validates if an OpenAI API key is configured and not an obvious placeholder.
+    Detects missing values, empty strings, and known placeholder templates such as:
+      - 'YOUR_REAL_API_KEY', 'YOUR_API_KEY', 'YOUR_KEY_HERE'
+      - 'sk-your-real-key-here', 'sk-your-...'
+      - 'placeholder', 'dummy', 'none', 'test', 'fake'
+    Returns (is_valid: bool, reason: str).
+    """
+    if not key or not str(key).strip():
+        return False, "API key is empty or not set."
+
+    cleaned_key = str(key).strip()
+
+    # Known placeholder patterns (case-insensitive)
+    placeholder_patterns = [
+        r"^sk-your.*",
+        r".*your[_-]?real[_-]?api[_-]?key.*",
+        r".*your[_-]?api[_-]?key.*",
+        r".*your[_-]?key.*",
+        r"^sk-placeholder.*",
+        r"^placeholder.*",
+        r"^dummy.*",
+        r"^test.*",
+        r"^fake.*",
+        r"^sk-\.\.\..*",
+        r"^\.\.\..*",
+        r"^<.*>$",
+        r"^sk-xxx.*",
+        r"^xxx.*",
+        r"^changeme.*",
+        r"^none$",
+        r"^null$"
+    ]
+
+    for pattern in placeholder_patterns:
+        if re.search(pattern, cleaned_key, flags=re.IGNORECASE):
+            return False, f"Detected placeholder API key ('{cleaned_key[:15]}...')."
+
+    # OpenAI API keys typically start with 'sk-' and are at least 20 characters
+    if not cleaned_key.startswith("sk-"):
+        return False, "OpenAI API keys typically start with 'sk-'."
+
+    if len(cleaned_key) < 20:
+        return False, "API key is too short to be a valid OpenAI key."
+
+    return True, "Valid API key format."
+
+
 def update_evaluation_report_markdown(summary: Dict[str, Any]):
     """
     Appends or updates the 'LLM-as-Judge Evaluation' section in docs/evaluation_report.md.
@@ -226,7 +294,7 @@ def update_evaluation_report_markdown(summary: Dict[str, Any]):
     content = REPORT_MD_PATH.read_text(encoding="utf-8")
 
     # Build the LLM-as-Judge Markdown section
-    status = summary.get("evaluation_status", "SKIPPED")
+    status = summary.get("evaluation_status", "NOT RUN — API authentication unavailable")
     section_lines = [
         "## LLM-as-Judge Evaluation",
         "",
@@ -261,9 +329,13 @@ def update_evaluation_report_markdown(summary: Dict[str, Any]):
             f"- **Strong Pass Rate (Score >= 4.0):** {strong_rate_val * 100:.1f}%",
             ""
         ])
-    elif status == "COMPLETED" and succ_judged == 0:
+    else:
         section_lines.extend([
-            f"### Execution Results (Evaluated on 0 / {summary['dataset_size']} Examples)",
+            "### Evaluation Status: NOT RUN — API authentication unavailable",
+            "The LLM-as-Judge evaluation harness is fully implemented in `src/llm_judge.py`. "
+            "Because a valid `OPENAI_API_KEY` was not configured in the execution environment, automated judging was **cleanly skipped** "
+            "rather than generating fabricated or synthetic scores.",
+            "",
             "- **Mean Correctness:** N/A",
             "- **Mean Grounding:** N/A",
             "- **Mean Relevance:** N/A",
@@ -271,14 +343,6 @@ def update_evaluation_report_markdown(summary: Dict[str, Any]):
             "- **Mean Overall Score:** N/A",
             "- **Pass Rate (Score >= 3.0):** N/A",
             "- **Strong Pass Rate (Score >= 4.0):** N/A",
-            ""
-        ])
-    else:
-        section_lines.extend([
-            "### Evaluation Status: SKIPPED (API Key Required)",
-            "The LLM-as-Judge evaluation harness is fully implemented in `src/llm_judge.py`. "
-            "Because `OPENAI_API_KEY` was not configured in the execution environment, automated judging was **cleanly skipped** "
-            "rather than generating fabricated or synthetic scores.",
             "",
             "> **How to Enable LLM-as-Judge:**",
             "> 1. Set your OpenAI API key: `export OPENAI_API_KEY='sk-...'` (or in PowerShell: `$env:OPENAI_API_KEY='sk-...'`).",
@@ -341,34 +405,40 @@ def main():
     total_examples = len(df_eval)
     print(f"Loaded {total_examples} agent evaluation results from {EVAL_RESULTS_PATH.name}.")
 
+    # Load .env if present in project root
+    load_env_file(PROJECT_ROOT / ".env")
+
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     model_name = os.environ.get("OPENAI_MODEL", "gpt-4o-mini").strip()
 
-    # Handle Missing API Key cleanly without fabrication
-    if not api_key:
+    is_valid_key, key_reason = is_valid_openai_api_key(api_key)
+
+    # Handle Missing or Placeholder API Key cleanly without fabrication
+    if not is_valid_key:
         print("\n" + "!" * 80)
-        print("NOTICE: OPENAI_API_KEY environment variable is NOT set.")
-        print("LLM-as-Judge evaluation is cleanly SKIPPED to avoid fabricating scores.")
+        print("No valid OpenAI API key configured. LLM-as-Judge skipped.")
+        print(f"Detail: {key_reason}")
         print("!" * 80)
-        print("\nTo enable LLM-as-Judge evaluation:")
-        print("  1. In PowerShell:  $env:OPENAI_API_KEY = \"your-api-key-here\"")
-        print("  2. In Windows CMD: set OPENAI_API_KEY=your-api-key-here")
-        print("  3. In Linux/macOS: export OPENAI_API_KEY=\"your-api-key-here\"")
-        print("  4. Re-run:         python src/llm_judge.py")
+        print("\nTo enable LLM-as-Judge evaluation with a real API key:")
+        print("  1. In PowerShell:  $env:OPENAI_API_KEY = \"sk-your-actual-key\"")
+        print("  2. In Windows CMD: set OPENAI_API_KEY=sk-your-actual-key")
+        print("  3. In Linux/macOS: export OPENAI_API_KEY=\"sk-your-actual-key\"")
+        print("  4. Or add OPENAI_API_KEY=sk-... to a local .env file (git-ignored)")
+        print("  5. Re-run:         python src/llm_judge.py")
         print("     (or test mode): python src/llm_judge.py --limit 1\n")
 
-        # Create empty CSV with required schema if it doesn't exist
-        if not OUTPUT_CSV_PATH.exists() or os.path.getsize(OUTPUT_CSV_PATH) == 0:
+        # Create empty CSV with required schema if it doesn't exist or is empty
+        if not OUTPUT_CSV_PATH.exists() or os.path.getsize(OUTPUT_CSV_PATH) <= 2:
             OUTPUT_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
             df_empty = pd.DataFrame(columns=CSV_HEADERS)
             df_empty.to_csv(OUTPUT_CSV_PATH, index=False)
             print(f"Initialized empty results file with required schema: {OUTPUT_CSV_PATH}")
 
-        # Create SKIPPED summary JSON
+        # Create SKIPPED summary JSON with explicit status
         summary_payload = {
-            "evaluation_status": "SKIPPED",
-            "reason": "OPENAI_API_KEY environment variable is not set.",
-            "how_to_enable": "Set the OPENAI_API_KEY environment variable and rerun python src/llm_judge.py",
+            "evaluation_status": "NOT RUN — API authentication unavailable",
+            "reason": f"No valid OpenAI API key configured ({key_reason}).",
+            "how_to_enable": "Set a valid OPENAI_API_KEY environment variable and rerun python src/llm_judge.py",
             "model": None,
             "dataset_size": total_examples,
             "successfully_judged": 0,
@@ -395,17 +465,17 @@ def main():
         OUTPUT_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
         with open(OUTPUT_JSON_PATH, "w", encoding="utf-8") as f:
             json.dump(summary_payload, f, indent=2)
-        print(f"Saved SKIPPED evaluation summary to: {OUTPUT_JSON_PATH}")
+        print(f"Saved evaluation summary to: {OUTPUT_JSON_PATH}")
 
         # Update evaluation report markdown
         update_evaluation_report_markdown(summary_payload)
 
         print("\n" + "=" * 80)
-        print("LLM-AS-JUDGE EXECUTION COMPLETE (STATUS: SKIPPED)")
+        print("LLM-AS-JUDGE EXECUTION COMPLETE (STATUS: NOT RUN — API authentication unavailable)")
         print("=" * 80)
         return
 
-    # If API key IS available, execute evaluation over target rows
+    # If API key IS available and valid format, execute evaluation over target rows
     print(f"Using OpenAI Model: {model_name}")
     print(f"Beginning LLM evaluation over {total_examples} examples...\n")
 
@@ -500,6 +570,7 @@ def main():
     # Calculate summary metrics across judged examples
     succ_count = len(df_final)
     if succ_count > 0:
+        status_label = "COMPLETED"
         mean_c = round(float(df_final["correctness"].mean()), 4)
         mean_g = round(float(df_final["grounding"].mean()), 4)
         mean_r = round(float(df_final["relevance"].mean()), 4)
@@ -508,11 +579,12 @@ def main():
         pass_rate = round(float(df_final["pass"].mean()), 4)
         strong_pass_rate = round(float(df_final["strong_pass"].mean()), 4)
     else:
+        status_label = "NOT RUN — API authentication unavailable"
         mean_c = mean_g = mean_r = mean_a = mean_overall = pass_rate = strong_pass_rate = None
 
     summary_payload = {
-        "evaluation_status": "COMPLETED",
-        "model": model_name,
+        "evaluation_status": status_label,
+        "model": model_name if succ_count > 0 else None,
         "dataset_size": total_examples,
         "successfully_judged": succ_count,
         "failed_examples": failed_count,
@@ -544,6 +616,7 @@ def main():
     print("\n" + "=" * 80)
     print("LLM-AS-JUDGE EXECUTION SUMMARY")
     print("=" * 80)
+    print(f"Status:                   {status_label}")
     print(f"Model:                    {model_name}")
     print(f"Successfully Judged:      {succ_count} / {total_examples}")
     print(f"Failed Examples:          {failed_count}")

@@ -332,3 +332,38 @@ The overall intent accuracy of **16.50%** must not be evaluated in isolation. A 
 4. **Lexical Retrieval Metrics:** Candidate reply retrieval diagnostics rely on cosine similarity and Jaccard overlap in the absence of human-annotated relevance rankings.
 5. **Silver Training Labels:** Baseline 1 was trained on historical tweets annotated with regex heuristics, causing it to partially learn keyword patterns rather than true semantic intent.
 6. **Verbatim Response Re-use:** Reusing historical support tweets risks device-version mismatches when historical context does not match the customer's specific hardware model.
+
+## LLM-as-Judge Evaluation
+
+In accordance with assignment requirements, an automated **LLM-as-Judge** evaluation protocol was developed to assess the qualitative properties of the agent's drafted replies. The judge evaluates each generated response against four core criteria scored on a 1-to-5 integer scale:
+
+1. **Correctness (1–5):** Does the response appropriately and accurately address the customer's problem?
+2. **Grounding (1–5):** Is the response supported by the retrieved historical support evidence without hallucinations?
+3. **Relevance (1–5):** Does the response stay focused on the user's issue without extraneous or distracting claims?
+4. **Actionability (1–5):** Does the response provide clear, constructive next steps (e.g., specific settings menu, DM transition)?
+
+### Scoring Rubric & Decision Thresholds
+- **Overall Score:** Arithmetic mean of Correctness, Grounding, Relevance, and Actionability: $\frac{C + G + R + A}{4}$
+- **Pass Threshold:** $\ge 3.0$ (response meets standard baseline support quality)
+- **Strong Pass Threshold:** $\ge 4.0$ (response demonstrates high fidelity, groundedness, and helpfulness)
+
+### Evaluation Status: NOT RUN — API authentication unavailable
+The LLM-as-Judge evaluation harness is fully implemented in `src/llm_judge.py`. Because a valid `OPENAI_API_KEY` was not configured in the execution environment, automated judging was **cleanly skipped** rather than generating fabricated or synthetic scores.
+
+- **Mean Correctness:** N/A
+- **Mean Grounding:** N/A
+- **Mean Relevance:** N/A
+- **Mean Actionability:** N/A
+- **Mean Overall Score:** N/A
+- **Pass Rate (Score >= 3.0):** N/A
+- **Strong Pass Rate (Score >= 4.0):** N/A
+
+> **How to Enable LLM-as-Judge:**
+> 1. Set your OpenAI API key: `export OPENAI_API_KEY='sk-...'` (or in PowerShell: `$env:OPENAI_API_KEY='sk-...'`).
+> 2. Run: `python src/llm_judge.py`.
+> 3. Results will be incrementally recorded in `data/processed/llm_judge_results.csv` and `data/processed/llm_judge_summary.json`.
+
+### Methodological Limitations & Ground-Truth Boundaries
+- **Not Ground Truth:** The LLM judge serves as a secondary heuristic signal. LLM-as-judge scores **must NOT be treated as ground truth** or claimed as human agreement.
+- **No Escalation Modification:** The judge evaluates reply phrasing quality only; it does **not** alter, replace, or invent escalation labels for the 56 unlabeled golden set examples.
+- **Model Bias:** LLM judges may exhibit verbosity or agreement bias; scores should be interpreted alongside lexical retrieval overlap and classifier accuracy.
